@@ -3,7 +3,7 @@
 // echo "empty";
 
 
-function xray_menu() {
+function act_open_pc_menu() {
  
   $items['node/%/openpc'] = array(
   
