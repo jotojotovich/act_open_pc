@@ -2,6 +2,13 @@
 
 // echo "empty";
 
+$count = 0;
+echo $count;
+
+if ($count == 0){
+  drupal_set_message($count);
+}
+// debug($nid);
 
 function act_open_pc_menu() {
  
@@ -71,8 +78,19 @@ var_dump($node->field_act_opening_pc_date["und"][0]["value"]);
 
 function get_pdf(){
     
+    // Счетчик pdf-актов
+    $pdf_count = 0;
+
+    if ($pdf_count < 1)
+    {
+      drupal_set_message('JKkj');
+    }
+
+    else {
+
     // Чтение ноды для генерации pdf
     $node = node_load(get_node_id());
+    
     
     
     $inner = '<h2>Акт ';
@@ -185,7 +203,11 @@ function get_pdf(){
 //   $mpdf->Output($pdfheader . '.pdf', 'D');
     $mpdf->Output(drupal_realpath($output_uri), 'D');
   
-    
+
+    $pdf_count++;
+    echo 'Актов: ' . $pdf_count;
+
+    }
    
 //   return FALSE;
 }
