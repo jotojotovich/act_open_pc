@@ -1,0 +1,3 @@
+name = act_open_pc
+description = Акт о вскрытии системного блока ПК.
+core = 7.x

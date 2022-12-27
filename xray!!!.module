@@ -1,0 +1,193 @@
+<?php
+
+// Это код после случайного удаления !!!!
+
+// echo "empty";
+
+
+function xray_menu() {
+ 
+  $items['node/%/openpc'] = array(
+  
+    'title' => 'Акт о вскрытии ПК',
+    'page callback' => 'get_pdf',
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+}
+
+
+function get_node_id()
+{
+    $id = '';
+    // Основной путь и GET-параметры
+    $url_str = $_SERVER['REQUEST_URI'];
+    // Разделение строки $url_str разделителем "/" с сохранением в массив
+    $url_item = explode('/', $url_str);
+//     print_r($url_item);
+
+    print '<br>';
+    // Проверить, можно ли элементы массива конвертировать в число
+    // Ожидается, что из всего массива будет получено только одно число, которое станет id текущей ноды
+    foreach($url_item as $i)
+    {
+//         var_dump($i);
+        $int_value = ctype_digit($i) ? intval($i) : null;
+//         print_r($int_value);
+//         print '<br>';
+        if ($int_value === null)
+        {
+            
+//             echo "wasn't all numeric" . "<br>";
+
+        }
+        else $id = intval($i);
+    };
+
+    return $id;
+}
+
+
+
+/**
+    Загрузка ноды
+*/
+// $node = node_load(get_node_id()); // стала ненужной в этом месте, т.к. перемещена в функцию ниже
+
+
+/** Для отладки */
+// print '<br>';
+// debug($node);
+/*
+$date = $node->field_act_opening_pc_date['und'][0]['value'];
+print_r($date);
+print('<br>');
+var_dump($node->field_act_opening_pc_date["und"][0]["value"]);
+*/
+
+/**
+    Генерация PDF
+*/
+
+function get_pdf(){
+    
+    // Чтение ноды для генерации pdf
+    $node = node_load(get_node_id());
+    
+    
+    $inner = '<h2>Акт ';
+    $inner .= 'от ' . $node->field_act_opening_pc_date['und'][0]['value'] . ' г.';
+    $inner .= '</h2>';
+    $inner .= '<p> Работник «ОРГАНИЗАЦИИ» - ' . $node->field_org['und'][0]['value'];
+    $inner .= ' «ДОЛЖНОСТЬ» - ' . $node->field_job_title['und'][0]['value'];
+    $inner .= ' , «ОТДЕЛ» - ' . $node->field_department['und'][0]['value'];
+    $inner .= ' «ФАМИЛИЯ ИМЯ ОТЧЕСТВО» - ' . $node->field_fio['und'][0]['value'];
+    $inner .= ' настоящим актом подтверждает, что им проведено вскрытие системного блока персонального компьютера (далее – ПК) для проведения работ в соответствии с Таблицей 1.</p>';
+    
+    $inner .= '<br><br>';
+    $inner .= '<p>Таблица 1 - Сведения о вскрытии</p>';
+    
+    $inner .= '<table width="100%" style="border-collapse:collapse; border-spacing: 0; border: 1px solid black;">';
+    $inner .= '<tr>';
+    $inner .= '<td>Дата вскрытия</td>';
+    $inner .= '<td>' . $node->field_act_opening_pc_date['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Организация</td>';
+    $inner .= '<td>' . $node->field_org['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Должность и ФИО пользователя ПК</td>';
+    $inner .= '<td>' . $node->field_user_fio['und'][0]['value'];
+    $inner .= '  ' . $node->field_user_job_title['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Расположение ПК</td>';
+    $inner .= '<td>' . $node->field_pc_location['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Инвентарный номер ПК</td>';
+    $inner .= '<td>' . $node->field_pc_inventory_number['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Номер печати до вскрытия</td>';
+    $inner .= '<td>' . $node->field_press_before_opening['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Номер печати после вскрытия</td>';
+    $inner .= '<td>' . $node->field_press_after_opening['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Причина вскрытия</td>';
+    $inner .= '<td>' . $node->field_why_opening['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>Выполненные работы</td>';
+    $inner .= '<td>' . $node->field_completed_works['und'][0]['value'] . '</td>';
+    $inner .= '</tr>';
+    $inner .= '</table>';
+    
+    $inner .= '<br><br>';
+    $inner .= '<br><br>';
+    
+    $inner .= '<table width="100%" style="border-collapse:collapse; border-spacing: 0; border: 1px solid black;">';
+    $inner .= '<tr>';
+    $inner .= '<td></td>';
+    $inner .= '<td>_______________/</td>';
+    $inner .= '<td>Фамилия И.О. специалиста ГАУ РК «ЦИТ»</td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td></td>';
+    $inner .= '<td>Факт вскрытия подтверждаю:</td>';
+    $inner .= '<td></td>';
+    $inner .= '</tr>';
+    $inner .= '<tr>';
+    $inner .= '<td>М.П. организации</td>';
+    $inner .= '<td>_______________/</td>';
+    $inner .= '<td>Фамилия И.О. пользователя ПК</td>';
+    $inner .= '</tr>';
+    $inner .= '</table>';
+    
+    $inner .= '<br><br><br><br><br><br><br><br><br><br>';
+    
+    $inner .= '<p style="font-size:10px;">Кокшарова Виктория Александровна.</p>';
+    $inner .= '<p style="font-size:10px;">_______________________________________</p>';
+    $inner .= '<p style="font-size:10px;"> 1 Перед вскрытием системного блока ПК с установленными средствами криптографической защиты информации, необходимо убедиться в целостности печатей, нанесенных на системный блок ПК с целью предотвращения несанкционированного вскрытия и доступа к техническим составляющим системного блока ПК. Выбрать соответствующий вариант (Нарушена/Не нарушена). В случае нарушения целостности печати, необходимо сообщить ответственному за организацию работ по криптографической защите информации в учреждении, в котором проводятся настоящие работы по удалению средств криптографической защиты информации.</p>';
+    
+
+    $content = '
+  <html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <style> 
+    * { font-family: "Times New Roman"; } 
+    body { font-size: 10pt; font-family: "Times New Roman"; }
+    p { margin: 0; } 
+    table { width: 100%; border-collapse: collapse; border: 1px solid black; border-spacing: 0; margin-bottom: 20px; }
+    td, th { border: 1px solid black; padding: 2px 4px; }
+    h1 { font-size: 13pt; text-align: center; }
+    caption { margin-bottom: 7px; text-align: right; }
+  </style>
+  </head>
+  <body>'.  $inner .'</body>
+  </html>';
+    
+    
+//     print_r($content);
+    
+    // Генерация PDF.
+    require_once DRUPAL_ROOT . '/sites/all/libraries/mpdf/mpdf60/mpdf.php';
+  
+    $mpdf = new mPDF('utf-8', 'A4', 0, '', 20, 8, 10, 10, 0, 0);
+    $mpdf->WriteHTML($content);
+  
+  // Сохранение PDF в файл.
+//   $mpdf->Output($pdfheader . '.pdf', 'D');
+    $mpdf->Output(drupal_realpath($output_uri), 'D');
+  
+    
+   
+//   return FALSE;
+}
